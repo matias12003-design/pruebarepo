@@ -27,9 +27,35 @@ jobs:
     - name: Run tests
       run: |
         pytest test_app.py -v
-
+        
+  security-scan:
+      needs: test
+      runs-on: ubuntu-latest
+      
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install safety
+        run: pip install safety
+      
+      - name: Check for vulnerable dependencies
+        run: safety check --file=requirements.txt --json
+        continue-on-error: true  # No falla el pipeline si encuentra vulns
+      
+      - name: Run Bandit (SAST para Python)
+        run: |
+          pip install bandit
+          bandit -r . -f json -o bandit-report.json || true
+          cat bandit-report.json
+          
   build:
-    needs: test
+    needs: [test, security-scan]
     runs-on: ubuntu-latest
     
     steps:
