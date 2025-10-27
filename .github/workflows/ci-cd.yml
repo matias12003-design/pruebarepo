@@ -44,9 +44,10 @@ jobs:
       - name: Install safety
         run: pip install safety
       
-      - name: Check for vulnerable dependencies
-        run: safety scan --file=requirements.txt --json
-        continue-on-error: true  # No falla el pipeline si encuentra vulns
+      - name: Safety scan with API key
+        env:
+          SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
+        run: safety scan
       
       - name: Run Bandit (SAST para Python)
         run: |
