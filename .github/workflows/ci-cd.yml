@@ -27,7 +27,7 @@ jobs:
     - name: Run tests
       run: |
         pytest test_app.py -v
-        
+
   security-scan:
       needs: test
       runs-on: ubuntu-latest
@@ -45,7 +45,7 @@ jobs:
         run: pip install safety
       
       - name: Check for vulnerable dependencies
-        run: safety check --file=requirements.txt --json
+        run: safety scan --file=requirements.txt --json
         continue-on-error: true  # No falla el pipeline si encuentra vulns
       
       - name: Run Bandit (SAST para Python)
