@@ -54,7 +54,23 @@ jobs:
           pip install bandit
           bandit -r . -f json -o bandit-report.json || true
           cat bandit-report.json
-          
+       
+      - name: Run Semgrep
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/secrets
+            p/python
+          generateSarif: true
+      
+      - name: Upload Semgrep results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+
+
   build:
     needs: [test, security-scan]
     runs-on: ubuntu-latest
@@ -117,7 +133,7 @@ jobs:
       with:
         name: zap-reports
         path: zap-reports/
-        
+
     - name: Stop application container
       if: always()
       run: |
