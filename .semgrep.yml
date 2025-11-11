@@ -1,0 +1,14 @@
+rules:
+  - id: hardcoded-secret-in-response
+    pattern: |
+      jsonify({..., "$KEY": "$VALUE", ...})
+    message: Possible hardcoded secret in JSON response
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+    focus-metavariable: $VALUE
+    metavariable-pattern:
+      metavariable: $KEY
+      patterns:
+        - pattern-regex: (secret|password|api_key|token|credential)

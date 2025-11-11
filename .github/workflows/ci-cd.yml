@@ -62,9 +62,9 @@ jobs:
       - name: Run Semgrep
         run: |
           pip install semgrep
-          semgrep scan --config=auto --sarif --output=semgrep.sarif || true
+          semgrep scan --config=auto --sarif --output=semgrep.sarif
           semgrep scan --config=auto --text
-        continue-on-error: true
+        continue-on-error: false
       
       - name: Upload Semgrep results to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
