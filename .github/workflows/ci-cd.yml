@@ -47,7 +47,7 @@ jobs:
       - name: Safety scan with API key
         env:
           SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
-        run: safety scan
+        run: safety scan --severity medium high critical
       
       - name: Run Bandit (SAST para Python)
         run: |
@@ -107,7 +107,7 @@ jobs:
           || true
 
     - name: Upload ZAP report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: zap-reports
