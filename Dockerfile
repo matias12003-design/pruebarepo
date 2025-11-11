@@ -14,4 +14,4 @@ RUN useradd -m -u 1000 appuser && \
 
 USER appuser
 
-CMD ["python", "app.py"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]

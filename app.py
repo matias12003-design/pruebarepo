@@ -49,9 +49,3 @@ def login():
     username = data.get('username', '')
     password = data.get('password', '')
     return jsonify({"message": f"Login attempt for {username}"})
-
-if __name__ == '__main__':
-    # En producción, usar un WSGI server (gunicorn, uwsgi)
-    host = os.environ.get('FLASK_HOST', '127.0.0.1')
-    port = int(os.environ.get('FLASK_PORT', 5000))
-    app.run(host=host, port=port)
