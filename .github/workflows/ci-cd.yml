@@ -78,3 +78,46 @@ jobs:
         curl http://localhost:5000/health
         docker stop test-container
         docker rm test-container
+
+  dast-scan:
+    name: DAST con OWASP ZAP
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      run: |
+        docker run -d -p 5000:5000 --name app-container pruebarepo:latest
+        echo "waiting for app init..."
+
+    - name: Wait for app to be ready
+      run: |
+        timeout 30s bash -c 'until curl -f http://localhost:5000/health; do sleep 2; done'
+        echo "✅ App is ready!"
+
+    - name: Run OWASP ZAP Baseline Scan
+      run: |
+        docker run --network="host" -v $(pwd):/zap/wrk:rw \
+          -t owasp/zap2docker-stable zap-baseline.py \
+          -t http://localhost:5000 \
+          -r zap-report.html \
+          -J zap-report.json \
+          || true
+
+    - name: Upload ZAP report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: zap-reports
+        path: |
+          zap-report.html
+          zap-report.json
+
+    - name: Stop application container
+      if: always()
+      run: |
+        docker logs app-container
+        docker stop app-container
+        docker rm app-container
