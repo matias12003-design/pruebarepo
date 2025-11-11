@@ -102,22 +102,22 @@ jobs:
 
     - name: Run OWASP ZAP Baseline Scan
       run: |
-        docker run --network="host" -v $(pwd):/zap/wrk:rw \
+        mkdir -p $(pwd)/zap-reports
+        chmod 777 $(pwd)/zap-reports
+        docker run --network="host" \
+          -v $(pwd)/zap-reports:/zap/wrk/:rw \
           -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
           -t http://localhost:5000 \
           -r zap-report.html \
-          -J zap-report.json \
-          || true
+          -J zap-report.json || true
 
-    - name: Upload ZAP report
+    - name: Upload ZAP Reports
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: zap-reports
-        path: |
-          zap-report.html
-          zap-report.json
-
+        path: zap-reports/
+        
     - name: Stop application container
       if: always()
       run: |
